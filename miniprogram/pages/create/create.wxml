@@ -1,0 +1,58 @@
+<view class="page create-page">
+  <privacy />
+  <view class="intro">
+    <text class="intro-title">把想买的东西放一放</text>
+    <text class="intro-sub">写下理由，选个冷静时长，到期后再决定</text>
+  </view>
+
+  <view class="card form-card">
+    <view class="field">
+      <text class="label">想买什么 <text class="required">*</text></text>
+      <input class="input" placeholder="例如：降噪耳机" maxlength="60"
+             value="{{productName}}" data-field="productName" bindinput="onInput" />
+    </view>
+
+    <view class="field">
+      <text class="label">多少钱 <text class="required">*</text></text>
+      <view class="price-wrap">
+        <text class="yuan">¥</text>
+        <input class="input price-input" type="digit" placeholder="0.00"
+               value="{{priceInput}}" data-field="priceInput" bindinput="onInput" />
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="label">为什么要买 <text class="required">*</text></text>
+      <textarea class="textarea" placeholder="真实一点，别骗自己。例：通勤地铁太吵，想安静听课"
+                maxlength="500" auto-height value="{{reason}}"
+                data-field="reason" bindinput="onInput" />
+    </view>
+
+    <view class="field">
+      <text class="label">不买的替代方案 <text class="optional">选填</text></text>
+      <textarea class="textarea" placeholder="例：用现有耳塞 + 免费白噪音 App"
+                maxlength="500" auto-height value="{{alternative}}"
+                data-field="alternative" bindinput="onInput" />
+      <text class="hint">写下替代方案的人，最终放弃购买的比例更高</text>
+    </view>
+
+    <view class="field">
+      <text class="label">冷静多久</text>
+      <picker mode="selector" range="{{cooldownOptions}}" range-key="label"
+              value="{{cooldownIndex}}" bindchange="onCooldownChange">
+        <view class="picker-value">
+          <text>{{cooldownOptions[cooldownIndex].label}}</text>
+          <text class="arrow">›</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="notice">
+    <text class="notice-text">提交后进入冷静期，期间不能确认购买。到期后由你最终决定，陌生人的投票只是建议。</text>
+  </view>
+
+  <button class="btn submit-btn" loading="{{submitting}}" disabled="{{submitting}}"
+          bindtap="onSubmit">提交，先冷静冷静</button>
+  <view class="tabbar-bottom"></view>
+</view>

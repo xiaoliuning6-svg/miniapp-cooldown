@@ -1,0 +1,33 @@
+.me-page { padding-bottom: 0; }
+
+.saved-card {
+  background: linear-gradient(135deg, #2f6fed, #5b8def);
+  border-radius: 20rpx; padding: 44rpx 36rpx; color: #fff;
+  margin-bottom: 24rpx;
+}
+.saved-label { font-size: 26rpx; opacity: .85; }
+.saved-amount { font-size: 76rpx; font-weight: 700; line-height: 1.3; margin: 12rpx 0; }
+.yuan { font-size: 40rpx; margin-right: 6rpx; }
+.saved-sub { font-size: 24rpx; opacity: .8; }
+
+.stats-card { display: flex; align-items: center; padding: 32rpx 16rpx; }
+.stat-item { flex: 1; text-align: center; }
+.stat-num { display: block; font-size: 40rpx; font-weight: 600; color: var(--text); }
+.stat-label { display: block; margin-top: 8rpx; font-size: 22rpx; color: var(--text-2); }
+.stat-divider { width: 1rpx; height: 56rpx; background: #eceef1; }
+
+.section-head { display: flex; align-items: center; justify-content: space-between; margin: 8rpx 4rpx 20rpx; }
+.section-title { font-size: 30rpx; font-weight: 600; }
+.mini-btn { height: 60rpx; padding: 0 24rpx; font-size: 24rpx; }
+
+.loading-box { padding: 80rpx 0; text-align: center; color: var(--text-2); font-size: 26rpx; }
+.load-tip { text-align: center; padding: 24rpx 0; color: var(--text-2); font-size: 24rpx; }
+
+.demo-tools {
+  margin: 24rpx 0 8rpx; padding: 28rpx; border-radius: 16rpx;
+  background: #fff8e6; border: 1rpx dashed #f0c86a;
+}
+.demo-tools-title { display: block; font-size: 26rpx; font-weight: 600; color: #a8761a; }
+.demo-tools-desc { display: block; margin: 8rpx 0 20rpx; font-size: 22rpx; color: #b8913f; }
+.demo-btn { background: #fff; color: #a8761a; border: 1rpx solid #f0c86a; font-size: 26rpx; }
+.demo-reset-btn { margin-top: 16rpx; color: #c0392b; border-color: #e6a29a; }

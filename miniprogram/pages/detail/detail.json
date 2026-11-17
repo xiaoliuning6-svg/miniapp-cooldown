@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "决策详情",
+  "usingComponents": {
+    "countdown": "/components/countdown/index",
+    "vote-bar": "/components/vote-bar/index"
+  },
+  "enablePullDownRefresh": true
+}

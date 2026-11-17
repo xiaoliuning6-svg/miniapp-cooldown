@@ -1,0 +1,12 @@
+<view class="dcard" bindtap="onTap">
+  <view class="dcard-head">
+    <text class="dcard-title ellipsis">{{item.productName}}</text>
+    <text class="dcard-price">¥{{item.priceText}}</text>
+  </view>
+  <text class="dcard-reason ellipsis">{{item.reason}}</text>
+  <view class="dcard-foot">
+    <text class="tag tag-{{item.status}}">{{statusMap[item.status]}}</text>
+    <text class="dcard-tally">👍 {{item.tally.approve}} · 👎 {{item.tally.reject}}</text>
+    <countdown wx:if="{{showCountdown && !item.expired}}" expire-at="{{item.expireAt}}" compact="true" />
+  </view>
+</view>

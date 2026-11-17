@@ -1,0 +1,6 @@
+.vb { background: #fff; border-radius: 16rpx; padding: 28rpx; }
+.vb-input { width: 100%; min-height: 140rpx; font-size: 28rpx; color: #1d2129; background: #f7f8fa; border-radius: 12rpx; padding: 20rpx; }
+.vb-btns { display: flex; gap: 20rpx; margin-top: 20rpx; }
+.vb-btns .btn { flex: 1; height: 80rpx; }
+.vb-reject { color: #e5484d; border-color: #e5484d; }
+.vb-done { text-align: center; color: #1a9d5a; font-size: 28rpx; padding: 40rpx 0; }

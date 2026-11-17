@@ -1,0 +1,4 @@
+<view class="cd {{compact ? 'cd-compact' : ''}}">
+  <text wx:if="{{!compact}}" class="cd-label">冷静期剩余</text>
+  <text class="cd-time">{{expired ? '已结束' : text}}</text>
+</view>

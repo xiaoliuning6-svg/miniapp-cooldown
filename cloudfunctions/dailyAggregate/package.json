@@ -1,0 +1,7 @@
+{
+  "name": "dailyAggregate",
+  "version": "1.0.0",
+  "description": "定时收口过期决策单",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

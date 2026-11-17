@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冷静一下 · 小程序可交互原型</title>
+<style>
+:root{
+  --primary:#2f6fed; --primary-deep:#2459cc; --danger:#e5484d; --success:#1a9d5a;
+  --warning:#f5a623; --text:#1d2129; --text2:#86909c; --bg:#f5f6f8; --card:#fff;
+  --line:#eceef1; --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:linear-gradient(135deg,#eef2f9 0%,#e8ecf4 50%,#f3f0ec 100%);
+  color:var(--text);display:flex;align-items:center;justify-content:center;gap:48px;padding:32px;
+}
+.info{max-width:340px}
+.info h1{font-size:30px;line-height:1.3;margin-bottom:14px;letter-spacing:-.5px}
+.info h1 span{color:var(--primary)}
+.info p{font-size:14px;line-height:1.85;color:#5c6472;margin-bottom:18px}
+.info ul{list-style:none;font-size:13px;color:#5c6472;line-height:2.1}
+.info li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--primary);margin-right:10px;vertical-align:2px}
+.info .badge{display:inline-block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--primary);background:rgba(47,111,237,.1);padding:5px 10px;border-radius:20px;margin-bottom:14px}
+.info .hint{margin-top:20px;font-size:12px;color:#949cab;border-left:2px solid #cbd4e4;padding-left:12px}
+
+/* 手机外壳 */
+.phone{
+  width:390px;height:844px;background:#fff;border-radius:44px;flex:none;position:relative;
+  box-shadow:0 2px 4px rgba(20,30,60,.06),0 24px 70px rgba(20,30,60,.18),0 0 0 10px #fdfdfe,0 0 0 11px #dfe3ea;
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.statusbar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13px;font-weight:600;color:var(--text);position:relative;z-index:5;background:#fff}
+.notch{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:110px;height:26px;border-radius:16px;background:#111}
+.statusbar .sb-right{display:flex;align-items:center;gap:5px}
+.sig{display:flex;align-items:flex-end;gap:2px;height:11px}
+.sig i{width:3px;background:var(--text);border-radius:1px;display:block}
+.sig i:nth-child(1){height:4px}.sig i:nth-child(2){height:7px}.sig i:nth-child(3){height:9px}.sig i:nth-child(4){height:11px}
+.battery{width:20px;height:10px;border:1.5px solid var(--text);border-radius:3px;position:relative;padding:1.5px}
+.battery::after{content:"";position:absolute;right:-4px;top:2px;width:2px;height:4px;background:var(--text);border-radius:0 2px 2px 0}
+.battery i{display:block;height:100%;width:75%;background:var(--text);border-radius:1px}
+.navbar{height:44px;flex:none;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #f4f5f7;font-size:16px;font-weight:600;z-index:4}
+.navbar .back{position:absolute;left:16px;top:0;height:44px;display:flex;align-items:center;font-size:24px;color:var(--text);cursor:pointer;background:none;border:none}
+.capsule{position:absolute;right:12px;top:8px;height:28px;border:1px solid #e5e7eb;border-radius:16px;display:flex;align-items:center;color:#4b5563;font-size:12px;background:#fff}
+.capsule span{padding:0 9px}.capsule span+span{border-left:1px solid #e5e7eb}
+.screen{flex:1;overflow-y:auto;background:var(--bg);position:relative;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.tabbar{height:64px;flex:none;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:10px;z-index:4}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;color:#9aa1ac;cursor:pointer;border:none;background:none}
+.tab.active{color:var(--primary)}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.page{display:none;min-height:100%}
+.page.show{display:block}
+.wrap{padding:16px}
+.card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(29,33,41,.035)}
+.muted{color:var(--text2);font-size:12px}
+.hero{padding:12px 4px 20px}
+.hero h2{font-size:25px;letter-spacing:-.5px;margin-bottom:6px}
+.hero p{font-size:13px;color:var(--text2)}
+
+.dcard{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(29,33,41,.035);cursor:pointer;transition:transform .12s}
+.dcard:active{transform:scale(.985)}
+.dcard .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dcard .name{font-size:16px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dcard .price{font-size:18px;font-weight:700;color:var(--danger)}
+.dcard .reason{font-size:13px;color:#606977;margin:9px 0 12px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dcard .foot{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;background:#f2f3f5;color:var(--text2);white-space:nowrap}
+.tag.cooling{background:#e8f0ff;color:var(--primary)}
+.tag.abandoned{background:#e6f7ee;color:var(--success)}
+.tag.purchased{background:#fff0e8;color:var(--warning)}
+.tag.rejected{background:#fdecec;color:var(--danger)}
+.cd{font-variant-numeric:tabular-nums;color:var(--primary);font-weight:600}
+.cd.expired{color:var(--text2)}
+.tally{display:inline-flex;align-items:center;gap:3px}
+.tally .up{color:var(--success)}.tally .down{color:var(--danger)}
+
+.btn{display:flex;align-items:center;justify-content:center;height:46px;border-radius:11px;background:var(--primary);color:#fff;font-size:15px;font-weight:500;border:none;width:100%;cursor:pointer;transition:opacity .15s}
+.btn:active{opacity:.85}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.danger{background:var(--danger)}
+.btn.sm{height:36px;font-size:13px;width:auto;padding:0 16px}
+.btn-row{display:flex;gap:10px}
+
+.empty{text-align:center;padding:70px 20px;color:var(--text2)}
+.empty .icon{width:56px;height:56px;border-radius:50%;background:#e9eef8;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:24px}
+.empty p{font-size:14px;margin-bottom:18px}
+
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:9px}
+.field label .req{color:var(--danger)}
+.field label .opt{color:var(--text2);font-weight:400;font-size:11px;margin-left:6px}
+.field input,.field textarea{
+  width:100%;border:none;background:#f7f8fa;border-radius:10px;padding:12px 14px;font-size:14px;
+  font-family:inherit;color:var(--text);outline:none;resize:none;line-height:1.6;
+}
+.field input:focus,.field textarea:focus{box-shadow:0 0 0 2px rgba(47,111,237,.25)}
+.field .hint{font-size:11px;color:var(--text2);margin-top:7px;line-height:1.5}
+.price-wrap{display:flex;align-items:center;background:#f7f8fa;border-radius:10px;padding-left:14px}
+.price-wrap span{color:var(--text2);font-size:17px}
+.price-wrap input{background:transparent}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1;min-width:70px;height:38px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:13px;color:#5c6472;cursor:pointer}
+.seg button.on{border-color:var(--primary);background:#eef3ff;color:var(--primary);font-weight:600}
+
+.detail-title{font-size:22px;font-weight:700;line-height:1.35}
+.detail-price{font-size:26px;font-weight:700;color:var(--danger)}
+.detail-meta{display:flex;align-items:center;gap:10px;margin-top:10px}
+.countdown-box{margin-top:18px;background:#f6f9ff;border-radius:12px;padding:18px;text-align:center}
+.countdown-box .lbl{font-size:12px;color:var(--text2);margin-bottom:8px}
+.countdown-box .big{font-size:32px;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;letter-spacing:1px}
+.countdown-box.done{background:#f4f5f7}
+.countdown-box.done .big{font-size:15px;color:var(--text)}
+.sec-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.sec-title.sub{margin-top:20px}
+.body-text{font-size:14px;line-height:1.75;color:#3d424c;white-space:pre-wrap;word-break:break-word}
+.bar{height:8px;border-radius:8px;background:#eef0f3;display:flex;overflow:hidden;margin:12px 0}
+.bar i{display:block;height:100%;transition:width .35s}
+.bar .a{background:var(--success)}.bar .b{background:var(--danger)}
+.bar-lbl{display:flex;justify-content:space-between;font-size:12px}
+.bar-lbl .a{color:var(--success)}.bar-lbl .b{color:var(--danger)}
+.vote-item{padding:13px 0;border-bottom:1px solid #f2f3f5}
+.vote-item:last-child{border-bottom:none}
+.vote-item .vh{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.vote-item .vr{font-size:13px;color:#4b5563;line-height:1.6}
+.tip{background:#f4f5f7;border-radius:11px;padding:14px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px}
+.tip.ok{background:#e9f8f0;color:var(--success)}
+
+.saved-card{background:linear-gradient(135deg,#2f6fed,#5b8def);border-radius:18px;padding:24px;color:#fff;margin-bottom:14px}
+.saved-card .lbl{font-size:12px;opacity:.85}
+.saved-card .amount{font-size:42px;font-weight:700;line-height:1.35;margin:6px 0}
+.saved-card .amount small{font-size:22px;margin-right:2px}
+.saved-card .sub{font-size:11px;opacity:.8}
+.stats{display:flex;align-items:center;padding:18px 6px}
+.stat{flex:1;text-align:center}
+.stat b{display:block;font-size:22px}
+.stat span{display:block;font-size:11px;color:var(--text2);margin-top:3px}
+.stat-div{width:1px;height:34px;background:var(--line)}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 12px}
+.section-head b{font-size:15px}
+
+/* 弹层 */
+.mask{position:absolute;inset:0;background:rgba(17,24,39,.45);display:none;align-items:flex-end;z-index:20}
+.mask.show{display:flex}
+.sheet{background:#fff;width:100%;border-radius:20px 20px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet h3{font-size:17px;margin-bottom:6px}
+.sheet p{font-size:12px;color:var(--text2);margin-bottom:14px}
+.sheet textarea{width:100%;height:86px;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:14px;font-family:inherit;resize:none;outline:none}
+.sheet textarea:focus{border-color:var(--primary)}
+.sheet .btn-row{margin-top:14px}
+.privacy-mask{position:absolute;inset:0;background:rgba(17,24,39,.55);display:none;align-items:center;justify-content:center;z-index:35;padding:24px}
+.privacy-mask.show{display:flex}
+.privacy-panel{background:#fff;border-radius:18px;padding:24px 20px;width:100%}
+.privacy-panel h3{font-size:19px;text-align:center;margin-bottom:14px}
+.privacy-panel .pp{font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:12px}
+.privacy-panel .pi{display:flex;gap:10px;font-size:12px;color:#4b5563;line-height:1.65;margin-bottom:10px}
+.privacy-panel .pi b{flex:none;width:20px;height:20px;border-radius:50%;background:#e8f0ff;color:#2f6fed;font-size:11px;text-align:center;line-height:20px}
+.privacy-panel .btn-row{margin-top:16px}
+.toast{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) scale(.94);z-index:40;
+  background:rgba(29,33,41,.9);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;
+  opacity:0;pointer-events:none;transition:all .2s;white-space:nowrap;max-width:80%;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.debug{margin-top:10px;text-align:center;font-size:11px;color:#a8afba;line-height:1.7}
+.debug button{border:1px dashed #cbd4e4;background:transparent;color:#8791a3;border-radius:7px;padding:5px 10px;font-size:11px;cursor:pointer;margin-top:4px}
+@media(max-width:900px){body{flex-direction:column;padding:16px;gap:20px}.info{max-width:390px;text-align:center}.info ul{text-align:left;display:inline-block}.phone{transform:scale(.88);transform-origin:top center;margin-bottom:-90px}}
+</style>
+</head>
+<body>
+
+<div class="info">
+  <div class="badge">可交互原型 · MVP</div>
+  <h1>冷静一下<br><span>把冲动消费交给陌生人评评理</span></h1>
+  <p>这是根据 <b>README.md</b> 与 <b>功能方案.md</b> 还原的可点击原型。数据存在浏览器本地，完整跑通「发起 → 投票 → 倒计时 → 结算 → 省钱账本」闭环。</p>
+  <ul>
+    <li>审批广场：投票必须写理由，且一人一票</li>
+    <li>冷静期内：结算按钮锁定，倒计时实时走</li>
+    <li>到期后：本人选"买了 / 放弃了"</li>
+    <li>放弃金额自动累加到"累计省下"</li>
+  </ul>
+  <div class="hint">真机版本是同目录下的微信原生小程序代码（4 页面 + 3 组件 + 10 云函数）。此原型仅供交互演示，不连接云端。</div>
+</div>
+
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span><div class="notch"></div>
+    <div class="sb-right"><div class="sig"><i></i><i></i><i></i><i></i></div><span>5G</span><div class="battery"><i></i></div></div>
+  </div>
+  <div class="navbar" id="navbar">
+    <button class="back" id="backBtn" style="display:none" onclick="goBack()">‹</button>
+    <span id="navTitle">审批广场</span>
+    <div class="capsule"><span>···</span><span>◎</span></div>
+  </div>
+  <div class="screen" id="screen">
+    <!-- 广场 -->
+    <div class="page show" id="page-index"><div class="wrap">
+      <div class="hero"><h2>买之前，先冷静一下</h2><p>把想买的东西交给陌生人评评理</p></div>
+      <div id="plazaList"></div>
+    </div></div>
+    <!-- 发起 -->
+    <div class="page" id="page-create"><div class="wrap">
+      <div class="hero"><h2>把想买的东西放一放</h2><p>写下理由，选个冷静时长，到期后再决定</p></div>
+      <div class="card">
+        <div class="field"><label>想买什么 <span class="req">*</span></label><input id="fName" placeholder="例如：降噪耳机" maxlength="60"></div>
+        <div class="field"><label>多少钱 <span class="req">*</span></label><div class="price-wrap"><span>¥</span><input id="fPrice" type="number" placeholder="0.00" min="0.01" step="0.01"></div></div>
+        <div class="field"><label>为什么要买 <span class="req">*</span></label><textarea id="fReason" placeholder="真实一点，别骗自己。例：通勤地铁太吵，想安静听课" maxlength="500"></textarea></div>
+        <div class="field"><label>不买的替代方案 <span class="opt">选填</span></label><textarea id="fAlt" placeholder="例：用现有耳塞 + 免费白噪音 App" maxlength="500"></textarea><div class="hint">写下替代方案的人，最终放弃购买的比例更高</div></div>
+        <div class="field"><label>冷静多久</label><div class="seg" id="segCooldown"></div></div>
+      </div>
+      <button class="btn" onclick="submitDecision()">提交，先冷静冷静</button>
+      <div class="debug">原型提示：提交后到「我的」页可点调试按钮快进时间</div>
+    </div></div>
+    <!-- 详情 -->
+    <div class="page" id="page-detail"><div class="wrap" id="detailBody"></div></div>
+    <!-- 我的 -->
+    <div class="page" id="page-me"><div class="wrap">
+      <div class="saved-card"><div class="lbl">累计省下</div><div class="amount"><small>¥</small><span id="savedAmount">0</span></div><div class="sub">每一次放弃，都是一次清醒的选择</div></div>
+      <div class="card stats">
+        <div class="stat"><b id="stSaved">0</b><span>放弃购买</span></div><div class="stat-div"></div>
+        <div class="stat"><b id="stCooling">0</b><span>冷静中</span></div><div class="stat-div"></div>
+        <div class="stat"><b id="stBought">0</b><span>还是买了</span></div>
+      </div>
+      <div class="section-head"><b>我的决策单</b><button class="btn sm ghost" onclick="switchTab('create')">+ 发起</button></div>
+      <div id="mineList"></div>
+      <div class="debug">原型调试<button onclick="fastForward()">把所有冷静期设为已结束</button><div>方便体验"到期后结算"闭环，不影响真实小程序</div></div>
+    </div></div>
+  </div>
+  <div class="tabbar">
+    <button class="tab active" data-tab="index" onclick="switchTab('index')">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>审批广场</span></button>
+    <button class="tab" data-tab="create" onclick="switchTab('create')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg><span>发起审批</span></button>
+    <button class="tab" data-tab="me" onclick="switchTab('me')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>我的</span></button>
+  </div>
+  <div class="mask" id="mask"><div class="sheet">
+    <h3 id="sheetTitle">说说你的建议</h3><p>至少写 2 个字，敷衍的一票不算数</p>
+    <textarea id="voteReason" placeholder="为什么建议买 / 不买？"></textarea>
+    <div class="btn-row"><button class="btn ghost" onclick="closeSheet()">取消</button><button class="btn" id="sheetOk">提交建议</button></div>
+  </div></div>
+  <div class="privacy-mask" id="privacyMask">
+    <div class="privacy-panel">
+      <h3>隐私说明</h3>
+      <p class="pp">「冷静一下」是消费决策辅助工具。开始使用前，请了解你的数据如何被使用：</p>
+      <p class="pi"><b>1</b><span>仅用微信 openid 识别身份，区分"我发起的"和"我投过票的"；不获取昵称、头像、手机号、位置。</span></p>
+      <p class="pi"><b>2</b><span>你提交的商品名、理由和投票理由会对其他用户可见——这是"陌生人审批"的核心机制。</span></p>
+      <p class="pi"><b>3</b><span>到期提醒需你主动授权订阅消息；不授权不影响其他功能。</span></p>
+      <p class="pi"><b>4</b><span>无支付、无广告推送、不向第三方出售数据。请勿在内容里填写个人信息。</span></p>
+      <div class="btn-row"><button class="btn ghost" onclick="agreePrivacy(false)">暂不使用</button><button class="btn" onclick="agreePrivacy(true)">我已了解</button></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  var KEY='cooldown-mvp-v1';
+  function now(){return Date.now()}
+  function h(n){return n*3600000}
+  function seed(){
+    var t=now();
+    return {
+      decisions:[
+        {id:'d1',openid:'me',productName:'降噪耳机',price:79900,reason:'通勤地铁太吵，想安静听听课。已经连续一周在地铁上听不清内容了。',alternative:'用现有的海绵耳塞 + 手机自带白噪音',cooldownHours:1,status:'cooling',tally:{approve:2,reject:3},expireAt:t+h(1),createdAt:t-1800000},
+        {id:'d2',openid:'u-7788',productName:'第三杯奶茶',price:2200,reason:'下午三点困得不行，想点杯奶茶提神，但是这个月已经喝了六杯了……',alternative:'站起来走十分钟 + 喝温水',cooldownHours:12,status:'cooling',tally:{approve:1,reject:5},expireAt:t+h(11),createdAt:t-3600000},
+        {id:'d3',openid:'u-5522',productName:'机械键盘',price:45900,reason:'看直播下单的，说是游戏手感特别好。但我其实已经有一把能用的键盘了。',alternative:'先用现有键盘打两周再说',cooldownHours:24,status:'cooling',tally:{approve:3,reject:8},expireAt:t+h(6),createdAt:t-5400000},
+        {id:'d4',openid:'me',productName:'限量球鞋',price:129900,reason:'看到联名款发售，怕抢不到。',alternative:'',cooldownHours:24,status:'abandoned',tally:{approve:0,reject:6},expireAt:t-h(20),createdAt:t-h(48),settledAt:t-h(20)}
+      ],
+      votes:{d1:[{choice:'approve',reason:'通勤刚需，值得',createdAt:t-1700000},{choice:'reject',reason:'可以先用现有耳塞试一周',createdAt:t-1600000},{choice:'reject',reason:'这个价位有点贵',createdAt:t-1500000}]},
+      totalSaved:129900,
+      myVotes:{},
+      seq:5
+    }
+  }
+  var S;
+  try{var raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):seed()}catch(e){S=seed()}
+  if(!S.decisions||!S.votes){S=seed()}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  function yuan(f){return (f/100).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1')}
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function ago(ts){var m=Math.floor((now()-ts)/60000);if(m<1)return'刚刚';if(m<60)return m+' 分钟前';var h=Math.floor(m/60);if(h<24)return h+' 小时前';return Math.floor(h/24)+' 天前'}
+  function cd(expireAt){
+    var diff=new Date(expireAt).getTime()-now();
+    if(diff<=0)return {expired:true,text:'已结束'};
+    var s=Math.floor(diff/1000),hh=Math.floor(s/3600),mm=Math.floor(s%3600/60),ss=s%60,p=function(x){return String(x).padStart(2,'0')};
+    return {expired:false,text:p(hh)+':'+p(mm)+':'+p(ss)}
+  }
+  function statusTag(d){
+    if(d.status==='cooling')return {cls:'cooling',text:'冷静中'};
+    if(d.status==='abandoned')return {cls:'abandoned',text:'已放弃·省下了'};
+    if(d.status==='purchased')return {cls:'purchased',text:'已购买'};
+    return {cls:'rejected',text:'已结束'};
+  }
+  var toastTimer;
+  function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show')},1800)}
+
+  var curTab='index', detailId=null, pendingChoice=null, cooldown=24;
+  var TITLES={index:'审批广场',create:'发起审批',me:'我的',detail:'决策详情'};
+
+  window.switchTab=function(tab){
+    curTab=tab;detailId=null;
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('show')});
+    document.getElementById('page-'+tab).classList.add('show');
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===tab)});
+    document.getElementById('backBtn').style.display='none';
+    document.getElementById('navTitle').textContent=TITLES[tab];
+    document.getElementById('screen').scrollTop=0;
+    render();
+  };
+  function openDetail(id){
+    detailId=id;curTab='detail';
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('show')});
+    document.getElementById('page-detail').classList.add('show');
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+    document.getElementById('backBtn').style.display='flex';
+    document.getElementById('navTitle').textContent='决策详情';
+    document.getElementById('screen').scrollTop=0;
+    render();
+  }
+  window.goBack=function(){switchTab(document.getElementById('detailBody').dataset.from||'index')};
+
+  function cardHtml(d){
+    var t=statusTag(d),c=cd(d.expireAt),mine=d.openid==='me';
+    return '<div class="dcard" onclick="openDetail(\''+d.id+'\')">'+
+      '<div class="top"><span class="name">'+esc(d.productName)+'</span><span class="price">¥'+yuan(d.price)+'</span></div>'+
+      '<div class="reason">'+esc(d.reason)+'</div>'+
+      '<div class="foot"><span class="tag '+t.cls+'">'+t.text+'</span>'+
+      '<span class="tally"><span class="up">建议买 '+(d.tally.approve||0)+'</span> · <span class="down">'+ (d.tally.reject||0)+' 建议别买</span></span>'+
+      (d.status==='cooling'?'<span class="cd'+(c.expired?' expired':'')+'" data-id="'+d.id+'">'+c.text+'</span>':'')+
+      (mine?'<span style="color:#b0b6c0">我发起的</span>':'')+'</div></div>';
+  }
+  window.openDetail=openDetail;
+
+  function render(){
+    var plaza=S.decisions.filter(function(d){return d.status==='cooling'&&cd(d.expireAt).expired===false});
+    document.getElementById('plazaList').innerHTML=plaza.length?plaza.map(cardHtml).join(''):
+      '<div class="empty"><div class="icon">✓</div><p>暂时没有待审批的决定</p><button class="btn ghost sm" onclick="switchTab(\'create\')">发起第一个审批</button></div>';
+    if(plaza.length)document.getElementById('plazaList').insertAdjacentHTML('beforeend','<div class="muted" style="text-align:center;padding:10px 0 24px">— 没有更多了 —</div>');
+
+    var mine=S.decisions.filter(function(d){return d.openid==='me'}).sort(function(a,b){return b.createdAt-a.createdAt});
+    document.getElementById('mineList').innerHTML=mine.length?mine.map(cardHtml).join(''):'<div class="empty"><p>还没有决策单</p></div>';
+    document.getElementById('savedAmount').textContent=yuan(S.totalSaved||0);
+    document.getElementById('stSaved').textContent=mine.filter(function(d){return d.status==='abandoned'}).length;
+    document.getElementById('stCooling').textContent=mine.filter(function(d){return d.status==='cooling'&&!cd(d.expireAt).expired}).length;
+    document.getElementById('stBought').textContent=mine.filter(function(d){return d.status==='purchased'}).length;
+
+    if(detailId)renderDetail();
+  }
+
+  function renderDetail(){
+    var d=S.decisions.find(function(x){return x.id===detailId});
+    if(!d){document.getElementById('detailBody').innerHTML='<div class="empty"><p>找不到这个决策单</p></div>';return}
+    var mine=d.openid==='me',c=cd(d.expireAt),expired=c.expired,
+        total=(d.tally.approve||0)+(d.tally.reject||0),
+        ap=total?Math.round(d.tally.approve/total*100):0,
+        rp=total?Math.round(d.tally.reject/total*100):0,
+        votes=S.votes[d.id]||[];
+    var html='<div data-from="'+(mine?'me':'index')+'"></div>';
+    html+='<div class="card"><div class="row" style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><span class="detail-title">'+esc(d.productName)+'</span><span class="detail-price">¥'+yuan(d.price)+'</span></div>'+
+      '<div class="detail-meta"><span class="tag '+statusTag(d).cls+'">'+statusTag(d).text+'</span><span class="muted">'+ago(d.createdAt)+'发起</span></div>'+
+      (d.status==='cooling'?'<div class="countdown-box'+(expired?' done':'')+'"><div class="lbl">'+(expired?'冷静期已结束，该你决定了':'距离可以决定还有')+'</div><div class="big'+(expired?'':' cd')+'" id="cdBig">'+c.text+'</div></div>':'')+'</div>';
+    html+='<div class="card"><div class="sec-title">我的理由</div><div class="body-text">'+esc(d.reason)+'</div>'+
+      (d.alternative?'<div class="sec-title sub">不买的替代方案</div><div class="body-text">'+esc(d.alternative)+'</div>':'')+'</div>';
+    html+='<div class="card"><div class="sec-title">大家的建议</div><div class="bar-lbl"><span class="a">建议买 '+(d.tally.approve||0)+'</span><span class="b">建议别买 '+(d.tally.reject||0)+'</span></div>'+
+      '<div class="bar"><i class="a" style="width:'+ap+'%"></i><i class="b" style="width:'+rp+'%"></i></div><div class="muted" style="text-align:center">投票只是建议，最终决定权在你</div></div>';
+    if(votes.length){
+      html+='<div class="card"><div class="sec-title">他们怎么说</div>'+votes.map(function(v){
+        return '<div class="vote-item"><div class="vh"><span style="color:'+(v.choice==='approve'?'var(--success)':'var(--danger)')+'">'+(v.choice==='approve'?'建议买':'建议别买')+'</span><span class="muted">'+ago(v.createdAt)+'</span></div><div class="vr">'+esc(v.reason)+'</div></div>';
+      }).join('')+'</div>';
+    }
+    if(!mine&&!expired&&d.status==='cooling'){
+      var voted=S.myVotes[d.id];
+      if(voted)html+='<div class="tip ok">你已经投过「'+(voted==='approve'?'建议买':'建议别买')+'」了，不能重复投票。</div>';
+      else html+='<div class="card"><div class="sec-title">说说你的建议</div><div class="btn-row"><button class="btn ghost" onclick="askVote(\'approve\')">建议买</button><button class="btn danger" onclick="askVote(\'reject\')">建议别买</button></div></div>';
+    }
+    if(mine&&!expired&&d.status==='cooling')html+='<div class="tip">这是你自己的决策单，等冷静期结束后再决定。别人的建议供你参考。</div>';
+    if(mine&&expired&&d.status==='cooling'){
+      html+='<div class="card"><div class="sec-title">冷静期结束，你怎么选？</div><div class="btn-row"><button class="btn ghost" onclick="settle(\'abandoned\')">我放弃了</button><button class="btn danger" onclick="settle(\'purchased\')">还是买了</button></div></div>';
+    }
+    if(mine&&d.status==='abandoned')html+='<div class="tip ok">已放弃，这笔钱省下了。</div>';
+    if(mine&&d.status==='purchased')html+='<div class="tip">已记录为购买。</div>';
+    html+='<button class="btn ghost" style="margin-top:4px" onclick="toast(\'原型内不连接微信分享\')">发给朋友看看</button>';
+    if(!mine)html+='<button class="btn ghost" style="margin-top:10px;color:var(--text2);border-color:#e5e7eb" onclick="askReport()">举报此内容</button>';
+    document.getElementById('detailBody').innerHTML=html;
+    document.getElementById('detailBody').dataset.from=mine?'me':'index';
+  }
+
+  window.askVote=function(choice){
+    var d=S.decisions.find(function(x){return x.id===detailId});
+    if(S.myVotes[d.id]){toast('你已经投过票了');return}
+    pendingChoice=choice;
+    document.getElementById('voteReason').value='';
+    document.getElementById('sheetOk').textContent=choice==='approve'?'提交「建议买」':'提交「建议别买」';
+    document.getElementById('mask').classList.add('show');
+  };
+  window.closeSheet=function(){document.getElementById('mask').classList.remove('show');pendingChoice=null};
+  document.getElementById('sheetOk').addEventListener('click',function(){
+    var reason=document.getElementById('voteReason').value.trim();
+    if(reason.length<2){toast('请写下至少 2 个字的理由');return}
+    var d=S.decisions.find(function(x){return x.id===detailId});
+    if(!d||S.myVotes[d.id]){toast('你已经投过票了');closeSheet();return}
+    S.myVotes[d.id]=pendingChoice;
+    if(!S.votes[d.id])S.votes[d.id]=[];
+    S.votes[d.id].unshift({choice:pendingChoice,reason:reason.slice(0,300),createdAt:now()});
+    if(pendingChoice==='approve')d.tally.approve++;else d.tally.reject++;
+    save();closeSheet();render();toast('已提交建议');
+  });
+
+  var cooldowns=[1,12,24,72];
+  function renderSeg(){
+    document.getElementById('segCooldown').innerHTML=cooldowns.map(function(v){
+      return '<button class="'+(v===cooldown?'on':'')+'" onclick="setCooldown('+v+')">'+(v===1?'1 小时':v===12?'12 小时':v===24?'24 小时':'72 小时')+'</button>';
+    }).join('');
+  }
+  window.setCooldown=function(v){cooldown=v;renderSeg()};
+
+  window.submitDecision=function(){
+    var name=document.getElementById('fName').value.trim(),
+        price=Number(document.getElementById('fPrice').value),
+        reason=document.getElementById('fReason').value.trim(),
+        alt=document.getElementById('fAlt').value.trim();
+    if(!name||!reason){toast('请填写商品名和购买理由');return}
+    if(!isFinite(price)||price<=0){toast('金额格式不对');return}
+    var fen=Math.round(price*100),t=now();
+    var d={id:'d'+(S.seq++),openid:'me',productName:name.slice(0,60),price:fen,reason:reason.slice(0,500),alternative:alt.slice(0,500),
+      cooldownHours:cooldown,status:'cooling',tally:{approve:0,reject:0},expireAt:t+h(cooldown),createdAt:t};
+    S.decisions.unshift(d);save();
+    ['fName','fPrice','fReason','fAlt'].forEach(function(id){document.getElementById(id).value=''});
+    switchTab('index');toast('已提交，先冷静冷静');
+  };
+
+  window.settle=function(action){
+    var d=S.decisions.find(function(x){return x.id===detailId});
+    if(!d||d.openid!=='me'||!cd(d.expireAt).expired)return;
+    if(action==='abandoned'){
+      d.status='abandoned';d.settledAt=now();S.totalSaved=(S.totalSaved||0)+d.price;
+      save();render();toast('省下 ¥'+yuan(d.price));
+    }else{
+      d.status='purchased';d.settledAt=now();save();render();toast('已记录为购买');
+    }
+  };
+
+  window.fastForward=function(){
+    var n=0;
+    S.decisions.forEach(function(d){if(d.status==='cooling'){d.expireAt=now()-1000;n++}});
+    save();render();toast(n?'已快进 '+n+' 个决策单':'没有冷静中的决策单');
+  };
+
+  window.askReport=function(){
+    var d=S.decisions.find(function(x){return x.id===detailId});
+    if(!d||d.openid==='me')return;
+    if((S.reports||[]).some(function(r){return r.decisionId===d.id})){toast('你已经举报过这个决策单了');return}
+    var reason=prompt('举报原因（至少 2 个字）：','例如：包含广告 / 虚假信息 / 不当内容');
+    if(reason===null)return;
+    reason=reason.trim();
+    if(reason.length<2){toast('请填写至少 2 个字');return}
+    if(!S.reports)S.reports=[];
+    S.reports.push({decisionId:d.id,reason:reason,createdAt:now(),status:'pending'});
+    save();toast('已收到举报，感谢反馈');
+  };
+
+  // 首次启动隐私说明：localStorage 记住同意状态
+  var PKEY='cooldown_privacy_agreed_v1';
+  try{
+    if(localStorage.getItem(PKEY)!=='1'){
+      document.getElementById('privacyMask').classList.add('show');
+    }
+  }catch(e){document.getElementById('privacyMask').classList.add('show')}
+  window.agreePrivacy=function(ok){
+    if(ok){try{localStorage.setItem(PKEY,'1')}catch(e){}}
+    document.getElementById('privacyMask').classList.remove('show');
+  };
+
+  renderSeg();render();
+  setInterval(function(){
+    document.querySelectorAll('.cd').forEach(function(el){
+      var d=S.decisions.find(function(x){return x.id===el.dataset.id});
+      if(d){var c=cd(d.expireAt);el.textContent=c.text}
+    });
+    var big=document.getElementById('cdBig');
+    if(big&&detailId){
+      var d2=S.decisions.find(function(x){return x.id===detailId});
+      if(d2&&d2.status==='cooling'){
+        var c2=cd(d2.expireAt);
+        big.textContent=c2.text;
+        if(c2.expired){render()}
+      }
+    }
+  },1000);
+})();
+</script>
+</body>
+</html>

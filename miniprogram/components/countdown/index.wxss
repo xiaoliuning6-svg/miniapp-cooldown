@@ -1,0 +1,4 @@
+.cd { display: flex; align-items: center; gap: 12rpx; }
+.cd-label { font-size: 24rpx; color: #86909c; }
+.cd-time { font-size: 34rpx; font-weight: 500; color: #2f6fed; font-variant-numeric: tabular-nums; }
+.cd-compact .cd-time { font-size: 22rpx; padding: 4rpx 12rpx; background: #eaf1ff; border-radius: 8rpx; }

@@ -1,0 +1,7 @@
+{
+  "name": "subscribePush",
+  "version": "1.0.0",
+  "description": "订阅消息提醒",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

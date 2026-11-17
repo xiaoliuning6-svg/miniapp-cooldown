@@ -1,0 +1,13 @@
+<view class="vb">
+  <view wx:if="{{submitted}}" class="vb-done">已投票，感谢你的建议</view>
+  <block wx:else>
+    <textarea
+      class="vb-input" value="{{reason}}" bindinput="onInput"
+      placeholder="说说你的理由（至少 2 个字，帮 TA 做决定）"
+      maxlength="300" disabled="{{disabled}}" />
+    <view class="vb-btns">
+      <button class="btn btn-ghost vb-reject" disabled="{{disabled}}" bindtap="onReject">建议别买</button>
+      <button class="btn vb-approve" disabled="{{disabled}}" bindtap="onApprove">建议买</button>
+    </view>
+  </block>
+</view>

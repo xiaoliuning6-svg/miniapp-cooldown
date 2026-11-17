@@ -1,0 +1,15 @@
+.dcard {
+  background: #fff; border-radius: 16rpx; padding: 28rpx; margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,.03);
+}
+.dcard-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12rpx; }
+.dcard-title { font-size: 30rpx; font-weight: 500; color: #1d2129; flex: 1; }
+.dcard-price { font-size: 32rpx; font-weight: 500; color: #e5484d; margin-left: 16rpx; }
+.dcard-reason { display: block; font-size: 24rpx; color: #86909c; margin-bottom: 20rpx; }
+.dcard-foot { display: flex; align-items: center; gap: 16rpx; }
+.tag { font-size: 22rpx; padding: 4rpx 14rpx; border-radius: 8rpx; background: #f2f3f5; color: #86909c; }
+.tag-cooling { background: #eaf1ff; color: #2f6fed; }
+.tag-passed { background: #e8f7ef; color: #1a9d5a; }
+.tag-rejected { background: #fdecec; color: #e5484d; }
+.tag-abandoned { background: #e8f7ef; color: #1a9d5a; }
+.dcard-tally { font-size: 22rpx; color: #86909c; }

@@ -1,0 +1,53 @@
+<view class="page me-page">
+  <privacy />
+  <view class="saved-card">
+    <text class="saved-label">累计省下</text>
+    <view class="saved-amount"><text class="yuan">¥</text>{{savedText}}</view>
+    <text class="saved-sub">每一次放弃，都是一次清醒的选择</text>
+  </view>
+
+  <view wx:if="{{profile}}" class="card stats-card">
+    <view class="stat-item">
+      <text class="stat-num">{{profile.savedCount}}</text>
+      <text class="stat-label">放弃购买</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-num">{{profile.coolingCount}}</text>
+      <text class="stat-label">冷静中</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-num">{{profile.purchasedCount}}</text>
+      <text class="stat-label">还是买了</text>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">我的决策单</text>
+    <button class="btn btn-ghost mini-btn" bindtap="onGoCreate">+ 发起</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-box"><text>加载中…</text></view>
+  <block wx:else>
+    <decision-card
+      wx:for="{{list}}" wx:key="id" item="{{item}}"
+      show-countdown="{{false}}" bind:tap="onCardTap" />
+    <view wx:if="{{list.length === 0}}" class="empty">
+      <text class="empty-text">还没有决策单</text>
+      <button class="btn btn-ghost empty-btn" bindtap="onGoCreate">发起第一个审批</button>
+    </view>
+    <view class="load-tip">
+      <text wx:if="{{listLoading}}">加载中…</text>
+      <text wx:elif="{{!hasMore && list.length > 0}}">没有更多了</text>
+    </view>
+  </block>
+
+  <view wx:if="{{demoMode}}" class="demo-tools">
+    <text class="demo-tools-title">演示模式</text>
+    <text class="demo-tools-desc">数据仅存本机，未连接云端</text>
+    <button class="btn btn-ghost demo-btn" bindtap="onDemoExpire">🚀 让所有冷静期立即到期</button>
+    <button class="btn btn-ghost demo-btn demo-reset-btn" bindtap="onDemoReset">🧹 清空我发起的所有单</button>
+  </view>
+  <view class="tabbar-bottom"></view>
+</view>

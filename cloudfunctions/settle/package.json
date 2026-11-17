@@ -1,0 +1,7 @@
+{
+  "name": "settle",
+  "version": "1.0.0",
+  "description": "冷静期结束后确认购买或放弃",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

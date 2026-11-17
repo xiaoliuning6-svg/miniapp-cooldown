@@ -1,0 +1,22 @@
+# 微信开发者工具本地私有配置（含本机路径、编译设置，不进仓库）
+project.private.config.json
+
+# 依赖
+node_modules/
+package-lock.json
+yarn.lock
+
+# 云函数本地依赖（上传时由云端安装）
+cloudfunctions/**/node_modules/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# 临时文件
+.gh-*.json
+.github-staging/
+.validate.cjs

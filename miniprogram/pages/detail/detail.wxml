@@ -1,0 +1,102 @@
+<view class="page detail-page">
+  <privacy />
+  <view wx:if="{{loading}}" class="loading-box"><text>加载中…</text></view>
+
+  <block wx:else>
+    <view wx:if="{{!detail}}" class="empty">
+      <text class="empty-text">找不到这个决策单</text>
+      <button class="btn btn-ghost" bindtap="onGoCreate">去发起一个</button>
+    </view>
+
+    <block wx:else>
+      <!-- 商品主卡 -->
+      <view class="card main-card">
+        <view class="row-between">
+          <text class="product-name">{{detail.productName}}</text>
+          <text class="price">¥{{priceText}}</text>
+        </view>
+        <view class="meta">
+          <text class="tag tag-{{detail.status}}">{{detail.status === 'cooling' ? '冷静中' : (detail.status === 'abandoned' ? '已放弃' : (detail.status === 'purchased' ? '已购买' : '已结束'))}}</text>
+          <text class="muted">{{detail.createdText}}发起</text>
+        </view>
+
+        <view wx:if="{{!expired}}" class="countdown-box">
+          <text class="countdown-label">距离可以决定还有</text>
+          <countdown expire-at="{{detail.expireAt}}" bind:expired="load" />
+        </view>
+        <view wx:else class="countdown-box expired-box">
+          <text class="countdown-label">冷静期已结束，该你决定了</text>
+        </view>
+      </view>
+
+      <!-- 本人填写的理由 -->
+      <view class="card">
+        <view class="section-title">我的理由</view>
+        <text class="content-text">{{detail.reason}}</text>
+        <block wx:if="{{detail.alternative}}">
+          <view class="section-title sub-title">不买的替代方案</view>
+          <text class="content-text">{{detail.alternative}}</text>
+        </block>
+      </view>
+
+      <!-- 投票结果 -->
+      <view class="card">
+        <view class="section-title">大家的建议</view>
+        <view class="row-between tally-line">
+          <text class="approve-text">建议买 {{detail.tally.approve}}</text>
+          <text class="reject-text">建议别买 {{detail.tally.reject}}</text>
+        </view>
+        <view class="bar">
+          <view class="bar-approve" style="width:{{detail.approvePercent}}%"></view>
+          <view class="bar-reject" style="width:{{detail.rejectPercent}}%"></view>
+        </view>
+        <text class="muted tally-tip">投票只是建议，最终决定权在你</text>
+      </view>
+
+      <!-- 陌生人理由 -->
+      <view wx:if="{{detail.votes.length > 0}}" class="card">
+        <view class="section-title">他们怎么说</view>
+        <view wx:for="{{detail.votes}}" wx:key="index" class="vote-item">
+          <view class="row-between">
+            <text class="vote-choice {{item.choice === 'approve' ? 'approve-text' : 'reject-text'}}">{{item.choiceText}}</text>
+            <text class="muted">{{item.timeText}}</text>
+          </view>
+          <text class="vote-reason">{{item.reason}}</text>
+        </view>
+      </view>
+
+      <!-- 投票区：非本人 + 冷静期内 -->
+      <view wx:if="{{canVote}}" class="card vote-card">
+        <view class="section-title">说说你的建议</view>
+        <vote-bar disabled="{{voting}}" submitted="{{voting}}"
+                  bind:vote="onVote" bind:needreason="onNeedReason" />
+      </view>
+      <view wx:elif="{{isMine && !expired}}" class="tip-card">
+        <text class="muted">这是你自己的决策单，等冷静期结束后再决定。别人的建议供你参考。</text>
+      </view>
+
+      <!-- 结算区：本人 + 冷静期已结束 -->
+      <view wx:if="{{isMine && expired && detail.status === 'cooling'}}" class="card settle-card">
+        <view class="section-title">冷静期结束，你怎么选？</view>
+        <view class="settle-row">
+          <button class="btn btn-ghost settle-btn" data-action="abandoned"
+                  loading="{{settling}}" disabled="{{settling}}" bindtap="onSettle">我放弃了</button>
+          <button class="btn settle-btn buy-btn" data-action="purchased"
+                  loading="{{settling}}" disabled="{{settling}}" bindtap="onSettle">还是买了</button>
+        </view>
+      </view>
+      <view wx:elif="{{isMine && expired && detail.status === 'abandoned'}}" class="tip-card success-tip">
+        <text>已放弃，这笔钱省下了。</text>
+      </view>
+
+      <!-- 订阅提醒 -->
+      <button wx:if="{{isMine && !expired}}" class="btn btn-ghost subscribe-btn" bindtap="onSubscribe">
+        到期时提醒我
+      </button>
+
+      <button class="btn btn-ghost share-btn" open-type="share">发给朋友看看</button>
+      <button wx:if="{{!isMine}}" class="btn btn-ghost report-btn" bindtap="onReport">举报此内容</button>
+    </block>
+  </block>
+  <view class="safe-bottom"></view>
+</view>

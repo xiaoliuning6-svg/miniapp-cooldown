@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的",
+  "usingComponents": {
+    "decision-card": "/components/decision-card/index"
+  },
+  "enablePullDownRefresh": true
+}

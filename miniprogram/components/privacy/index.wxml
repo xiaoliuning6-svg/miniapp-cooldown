@@ -1,0 +1,17 @@
+<view wx:if="{{visible}}" class="mask">
+  <view class="panel">
+    <view class="title">隐私说明</view>
+    <view class="body">
+      <view class="para">「冷静一下」是一个消费决策辅助工具。为了让你能正常使用，我们需要说明数据的使用方式：</view>
+      <view class="item"><text class="dot">1</text><text>我们用你的微信 openid 识别身份，用于区分"我发起的"和"我投过票的"，不会获取你的昵称、头像、手机号或位置。</text></view>
+      <view class="item"><text class="dot">2</text><text>你提交的商品名、理由，以及你写的投票理由，会对其他用户可见——这是"陌生人审批"的核心机制。</text></view>
+      <view class="item"><text class="dot">3</text><text>若选择"到期提醒"，我们会通过微信订阅消息给你发送通知；不授权则不影响其他功能。</text></view>
+      <view class="item"><text class="dot">4</text><text>本小程序不接入支付、不收集支付信息、不用于广告推送，也不会把数据卖给第三方。</text></view>
+      <view class="para warn">请谨慎填写包含个人信息的商品名和理由。</view>
+    </view>
+    <view class="actions">
+      <button class="btn btn-ghost" bindtap="onDisagree">暂不使用</button>
+      <button class="btn" bindtap="onAgree">我已了解</button>
+    </view>
+  </view>
+</view>
