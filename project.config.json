@@ -2,7 +2,7 @@
   "description": "冷静期/消费审批小程序 - MVP",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
-  "appid": "wxaf8dcd36953025b8",
+  "appid": "touristappid",
   "projectname": "miniapp-cooldown",
   "setting": {
     "urlCheck": false,

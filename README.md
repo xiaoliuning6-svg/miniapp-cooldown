@@ -46,15 +46,15 @@ miniapp-cooldown/
 
 ### A. 演示模式（默认，零配置，推荐先看这个）
 
-1. 打开微信开发者工具 → 「导入项目」→「目录」选下面这一层（就是有 `project.config.json` 的那层）：
+1. 打开微信开发者工具 → 「导入项目」→「目录」选**仓库根目录**（就是有 `project.config.json` 的那一层）：
 
    ```
-   E:\AIsoftware\workBuddyworkkongjian\workbuddy0804\2026-11-17-18-38-13\miniapp-cooldown
+   <你 clone 或解压出来的路径>/miniapp-cooldown
    ```
 
    > 注意是 `miniapp-cooldown` 这一层，**不要**再往里选到 `miniprogram`（那里没有 `project.config.json`，导入会失败）。
 
-2. AppID 选「测试号」或直接留游客 AppID（无需你自己的账号），点确定。
+2. AppID 选「测试号」或直接留游客 AppID（无需你自己的账号），点确定。仓库里的 `project.config.json` 已写成 `touristappid`，任何人都能直接跑；换成你自己的 AppID 见 B 节第 1 步。
 3. 编译即可用。数据存在本机，`utils/config.js` 里 `CLOUD_ENV` 还是占位符时自动走演示模式。
 
 演示模式默认是**空库**（存储 key `demo_cooldown_db_v2`）：广场和"我的"都没有数据，省钱账本 ¥0——所有决策单由你自己发起，从零开始。旧版预置数据会在重新编译时自动清理，无需手动操作。发起后完整闭环都能点：
